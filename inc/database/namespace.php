@@ -102,14 +102,11 @@ function conform_table( string $name, array $schema ) {
 			);
 		}
 
-		var_dump( $parsed );
 		$missing_indexes[ $parsed['name'] ] = $index;
 	}
 
 	header( 'Content-Type: text/plain' );
 	$existing_indexes = $wpdb->get_results( sprintf( 'SHOW INDEX FROM %s;', $name ) );
-	var_dump( $existing_indexes, $missing_indexes );
-	exit;
 
 	foreach ( $existing_indexes as $index ) {
 		$key = $index->Key_name;
@@ -139,7 +136,7 @@ function conform_table( string $name, array $schema ) {
 	$statement = sprintf(
 		"ALTER TABLE %s\n\t%s",
 		$name,
-		implode( ",\n\t", $alter_statements ),
+		implode( ",\n\t", $alter_statements )
 	);
 
 	$prev = $wpdb->suppress_errors();
