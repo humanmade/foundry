@@ -76,8 +76,11 @@ class Query {
 		list( $where, $where_values ) = $this->build_where( $args );
 		$where_statement = empty( $where ) ? '' : 'WHERE ' . implode( ' AND ', $where );
 
-		$offset = 0;
-		$limit = 10;
+		$page = $args['page'] ?? 1;
+		$per_page = $args['per_page'] ?? 10;
+
+		$offset = ( $page * $per_page ) - $per_page;
+		$limit = $per_page;
 
 		$query = sprintf(
 			'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` %s LIMIT %d, %d',
