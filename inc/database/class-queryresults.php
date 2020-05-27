@@ -2,9 +2,11 @@
 
 namespace Foundry\Database;
 
+use Countable;
+use ArrayAccess;
 use Iterator;
 
-class QueryResults implements Iterator {
+class QueryResults implements ArrayAccess, Countable, Iterator {
 	protected $config;
 
 	protected $results;
@@ -47,6 +49,26 @@ class QueryResults implements Iterator {
 		return new $model( (array) $this->results[ $this->position ] );
 	}
 
+	public function offsetExists( $offset ) : bool {
+		return isset( $this->results[ $offset ] );
+	}
+
+	public function offsetGet( $offset ) {
+		if ( ! isset( $this->results[ $offset ] ) ) {
+			return null;
+		}
+		$model = $this->config['model'];
+		return new $model( (array) $this->results[ $offset ] );
+	}
+
+	public function offsetSet( $offset, $value ) {
+		// no op, the results set is immutable.
+	}
+
+	public function offsetUnset( $offset ) {
+		// no op, the results set is immutable.
+	}
+
 	/**
 	 * Get the key for the current item.
 	 *
@@ -72,6 +94,15 @@ class QueryResults implements Iterator {
 	 */
 	public function valid() {
 		return isset( $this->results[ $this->position ] );
+	}
+
+	/**
+	 * Get the number of results.
+	 *
+	 * @return int
+	 */
+	public function count() : int {
+		return count( $this->results );
 	}
 
 	/**

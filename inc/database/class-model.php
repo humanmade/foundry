@@ -32,7 +32,7 @@ abstract class Model {
 		$this->data = $data;
 	}
 
-	public static function query( $args ) {
+	public static function query( array $args ) : Query {
 		$config = [
 			'model' => get_called_class(),
 			'table' => static::get_table_name(),
