@@ -61,12 +61,23 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 		return new $model( (array) $this->results[ $offset ] );
 	}
 
+	/**
+	 * No op, the results set is immutable.
+	 *
+	 * @param mixed $offset
+	 * @param mixed $value
+	 * @return void
+	 */
 	public function offsetSet( $offset, $value ) {
-		// no op, the results set is immutable.
 	}
 
+	/**
+	 * No op, the results set is immutable.
+	 *
+	 * @param mixed $offset
+	 * @return void
+	 */
 	public function offsetUnset( $offset ) {
-		// no op, the results set is immutable.
 	}
 
 	/**
