@@ -40,7 +40,7 @@ function get_formatter( &$assoc_args, array $default_fields ) {
  * Read post content from file or STDIN
  *
  * @param string $arg Supplied argument
- * @return string
+ * @return resource
  */
 function read_from_file_or_stdin( $arg ) {
 	if ( '-' !== $arg ) {
@@ -51,7 +51,7 @@ function read_from_file_or_stdin( $arg ) {
 	} else {
 		$readfile = 'php://stdin';
 	}
-	return file_get_contents( $readfile );
+	return fopen( $readfile, 'r' );
 }
 
 function parse_assoc_arg( $value, $schema, $param ) {
