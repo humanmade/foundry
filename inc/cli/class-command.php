@@ -296,8 +296,8 @@ abstract class Command {
 	 */
 	public function list_( array $args, array $assoc_args ) {
 		$defaults = [
-			'posts_per_page' => -1,
-			'post_status'    => 'any',
+			'per_page' => 100,
+			'page' => 1,
 		];
 
 		$query_args = array_merge( $defaults, $assoc_args );
