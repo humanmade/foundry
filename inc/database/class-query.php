@@ -79,7 +79,7 @@ class Query {
 		$page = $args['page'] ?? 1;
 		$per_page = $args['per_page'] ?? 10;
 
-		$offset = ( $page * $per_page ) - $per_page;
+		$offset = ( $page - 1 ) * $per_page;
 		$limit = $per_page;
 
 		$query = sprintf(
