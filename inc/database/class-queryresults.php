@@ -108,7 +108,9 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	}
 
 	/**
-	 * Get the number of results.
+	 * Get the number of queried objects.
+	 *
+	 * This is the number of objects in the current results, that can be iterated over.
 	 *
 	 * @return int
 	 */
