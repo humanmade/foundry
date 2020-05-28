@@ -2,9 +2,11 @@
 
 namespace Foundry\Database;
 
+use Countable;
+use ArrayAccess;
 use Iterator;
 
-class QueryResults implements Iterator {
+class QueryResults implements ArrayAccess, Countable, Iterator {
 	protected $config;
 
 	protected $results;
@@ -40,11 +42,54 @@ class QueryResults implements Iterator {
 	 *
 	 * Instantiates the model just-in-time to minimise memory usage.
 	 *
-	 * @return \Foundry\Database\Model
+	 * @return Model
 	 */
 	public function current() {
 		$model = $this->config['model'];
 		return new $model( (array) $this->results[ $this->position ] );
+	}
+
+	/**
+	 * Check if there is an object at the given offset.
+	 *
+	 * @param int $offset
+	 * @return bool
+	 */
+	public function offsetExists( $offset ) : bool {
+		return isset( $this->results[ $offset ] );
+	}
+
+	/**
+	 * Get an object at the given offset.
+	 *
+	 * @param int $offset
+	 * @return Model|null
+	 */
+	public function offsetGet( $offset ) {
+		if ( ! isset( $this->results[ $offset ] ) ) {
+			return null;
+		}
+		$model = $this->config['model'];
+		return new $model( (array) $this->results[ $offset ] );
+	}
+
+	/**
+	 * No op, the results set is immutable.
+	 *
+	 * @param mixed $offset
+	 * @param mixed $value
+	 * @return void
+	 */
+	public function offsetSet( $offset, $value ) {
+	}
+
+	/**
+	 * No op, the results set is immutable.
+	 *
+	 * @param mixed $offset
+	 * @return void
+	 */
+	public function offsetUnset( $offset ) {
 	}
 
 	/**
@@ -75,6 +120,17 @@ class QueryResults implements Iterator {
 	}
 
 	/**
+	 * Get the number of queried objects.
+	 *
+	 * This is the number of objects in the current results, that can be iterated over.
+	 *
+	 * @return int
+	 */
+	public function count() : int {
+		return count( $this->results );
+	}
+
+	/**
 	 * Cast the iterator to an array.
 	 *
 	 * Generally, the iterator can be iterated directly without needing to be
@@ -84,7 +140,7 @@ class QueryResults implements Iterator {
 	 * Note that this will instantiate all objects in the array, and may lead
 	 * to high memory usage.
 	 *
-	 * @return \Foundry\Database\Model[]
+	 * @return Model[]
 	 */
 	public function as_array() {
 		return iterator_to_array( $this );

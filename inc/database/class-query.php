@@ -97,6 +97,11 @@ class Query {
 		return $prepared;
 	}
 
+	/**
+	 * Fetch the results for the query
+	 *
+	 * @return WP_Error|QueryResults
+	 */
 	public function get_results() {
 		/** @var \wpdb $wpdb */
 		global $wpdb;
