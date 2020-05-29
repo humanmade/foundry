@@ -24,8 +24,10 @@ abstract class Importer {
 	/**
 	 * Prepare an item for the database.
 	 *
-	 * @param TModel $model Model object.
-	 * @param TItem $item Row from the import data to prepare.
+	 * @param Model $model Model object.
+	 * @psalm-param TModel $model
+	 * @param mixed $item
+	 * @psalm-param TItem $item
 	 * @return TModel|\WP_Error Modified model on success, or WP_Error object on failure.
 	 */
 	abstract protected function prepare_import_item_for_database( Database\Model $model, $item );
