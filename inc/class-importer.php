@@ -31,18 +31,40 @@ abstract class Importer {
 	abstract protected function prepare_import_item_for_database( Database\Model $model, $item );
 
 	/**
+	 * Get an existing model for an import item
+	 *
+	 * @param TItem $item Row from the import data.
+	 * @return ?TModel
+	 */
+	abstract protected function get_model_for_item( $item ) : ?Database\Model;
+
+	/**
 	 * Import items.
 	 *
 	 * @param iterable $items
 	 * @psalm-param iterable<int, TItem> $items
 	 * @param boolean $dry_run True to skip committing changes to the database.
-	 * @return WP_Error|true
+	 * @return WP_Error|array
+	 * @psalm-return WP_Error|array{ total: int, inserted: int, updated: int }
 	 */
-	protected function import_items( iterable $items, bool $dry_run = false ) {
+	public function import_items( iterable $items, bool $dry_run = false ) {
 		$model_class = static::get_model();
 		$models = [];
+		$result = [
+			'total' => 0,
+			'inserted' => 0,
+			'updated' => 0,
+		];
+
 		foreach ( $items as $item ) {
-			$model = new $model_class();
+			$result['total']++;
+			$model = $this->get_model_for_item( $item );
+			if ( $model ) {
+				$result['updated']++;
+			} else {
+				$result['inserted']++;
+				$model = new $model_class();
+			}
 			$model = $this->prepare_import_item_for_database( $model, $item );
 			if ( is_wp_error( $model ) ) {
 				return $model;
@@ -51,10 +73,10 @@ abstract class Importer {
 			$models[] = $model;
 		}
 
-		$result = Database\save_many( $models, (bool) $dry_run );
-		if ( is_wp_error( $result ) ) {
-			return $result;
+		$db_update = Database\save_many( $models, (bool) $dry_run );
+		if ( is_wp_error( $db_update ) ) {
+			return $db_update;
 		}
-		return true;
+		return $result;
 	}
 }
