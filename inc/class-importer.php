@@ -28,7 +28,8 @@ abstract class Importer {
 	 * @psalm-param TModel $model
 	 * @param mixed $item
 	 * @psalm-param TItem $item
-	 * @return TModel|\WP_Error Modified model on success, or WP_Error object on failure.
+	 * @return Model|WP_Error Modified model on success, or WP_Error object on failure.
+	 * @psalm-return TModel|WP_Error
 	 */
 	abstract protected function prepare_import_item_for_database( Database\Model $model, $item );
 
