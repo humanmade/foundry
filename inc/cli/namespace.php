@@ -42,7 +42,7 @@ function get_formatter( &$assoc_args, array $default_fields ) {
  * @param string $arg Supplied argument
  * @return resource
  */
-function read_from_file_or_stdin( $arg ) {
+function open_file_or_stdin( $arg ) {
 	if ( '-' !== $arg ) {
 		$readfile = $arg;
 		if ( ! file_exists( $readfile ) || ! is_file( $readfile ) ) {
