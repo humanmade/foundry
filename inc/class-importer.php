@@ -16,7 +16,8 @@ abstract class Importer {
 	 *
 	 * @internal This is implemented by Command.
 	 *
-	 * @return class-string<TModel> Class name of a model.
+	 * @return string Class name of a model.
+	 * @psalm-return class-string<TModel>
 	 */
 	abstract protected static function get_model() : string;
 
@@ -32,7 +33,8 @@ abstract class Importer {
 	/**
 	 * Import items.
 	 *
-	 * @param iterable<int, TItem> $items
+	 * @param iterable $items
+	 * @psalm-param iterable<int, TItem> $items
 	 * @param boolean $dry_run True to skip committing changes to the database.
 	 * @return WP_Error|true
 	 */
