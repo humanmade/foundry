@@ -16,20 +16,20 @@ abstract class Importer {
 	 *
 	 * @internal This is implemented by Command.
 	 *
-	 * @return string Class name of a model.
 	 * @psalm-return class-string<TModel>
+	 * @return string Class name of a model.
 	 */
 	abstract protected static function get_model() : string;
 
 	/**
 	 * Prepare an item for the database.
 	 *
-	 * @param Model $model Model object.
 	 * @psalm-param TModel $model
-	 * @param mixed $item
 	 * @psalm-param TItem $item
-	 * @return Model|WP_Error Modified model on success, or WP_Error object on failure.
 	 * @psalm-return TModel|WP_Error
+	 * @param Model $model Model object.
+	 * @param mixed $item
+	 * @return Model|WP_Error Modified model on success, or WP_Error object on failure.
 	 */
 	abstract protected function prepare_import_item_for_database( Database\Model $model, $item );
 
@@ -44,11 +44,11 @@ abstract class Importer {
 	/**
 	 * Import items.
 	 *
-	 * @param iterable $items
 	 * @psalm-param iterable<int, TItem> $items
+	 * @psalm-return WP_Error|array{ total: int, inserted: int, updated: int }
+	 * @param iterable $items
 	 * @param boolean $dry_run True to skip committing changes to the database.
 	 * @return WP_Error|array
-	 * @psalm-return WP_Error|array{ total: int, inserted: int, updated: int }
 	 */
 	public function import_items( iterable $items, bool $dry_run = false ) {
 		$model_class = static::get_model();
