@@ -121,7 +121,7 @@ class Query {
 				}
 
 				if ( isset( $args[ $key ] ) ) {
-					$query_where = $this->build_where_for_field_where_claus( $key, $args[ $key ] );
+					$query_where = $this->build_where_for_field_where_clause( $key, $args[ $key ] );
 					if ( is_wp_error( $query_where ) ) {
 						return $query_where;
 					}
