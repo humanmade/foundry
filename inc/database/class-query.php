@@ -139,7 +139,7 @@ class Query {
 	}
 
 	/**
-	 * Get the "where" SQL for a single column and value.
+	 * Get the WHERE SQL clause for a single column and value.
 	 *
 	 * @psalm-param TWhereFieldQuery $clause
 	 * @psalm-return array{ 0: string, 1: list<mixed> }|WP_Error
