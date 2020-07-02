@@ -26,7 +26,7 @@ use WP_Error;
  *    value: int|float|string|bool
  * }|scalar|TWhereDateFieldQuery
  *
- * @psalm-type TWhereClaus = array {
+ * @psalm-type TWhereClause = array {
  *     relation?: 'OR'|'AND',
  *     fields: array<array-key, TWhereFieldQuery>
  * }|array<array-key, TWhereFieldQuery>
