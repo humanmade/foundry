@@ -57,7 +57,7 @@ class Query {
 	/**
 	 * Undocumented function
 	 *
-	 * @psalm-param TWhereClaus $args
+	 * @psalm-param TWhereClause $args
 	 * @psalm-return array{ 0: string, 1: list<scalar> }
 	 *
 	 * @param array $args
