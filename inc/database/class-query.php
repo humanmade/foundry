@@ -148,7 +148,7 @@ class Query {
 	 * @param mixed $clause
 	 * @return array|WP_Error
 	 */
-	protected function build_where_for_field_where_claus( string $field, $clause ) {
+	protected function build_where_for_field_where_clause( string $field, $clause ) {
 		$fields = $this->config['schema']['fields'];
 
 		$where = [];
