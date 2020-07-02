@@ -67,7 +67,7 @@ class Query {
 		$where = [];
 		$where_values = [];
 
-		// The full args should be defined per TWhereClaus, but we support $args
+		// The full args should be defined per TWhereClause, but we support $args
 		// just being the `fields`, which is an implicit AND relation.
 		if ( ! isset( $args['relation'] ) ) {
 			$args = [
