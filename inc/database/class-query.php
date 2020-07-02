@@ -182,7 +182,6 @@ class Query {
 		}
 
 		return [ $where, $where_values ];
-
 	}
 
 	protected function build_query( array $extra_args = [] ) : string {
