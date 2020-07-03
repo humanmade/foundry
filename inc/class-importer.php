@@ -3,11 +3,10 @@
 namespace Foundry;
 
 use Foundry\Database;
-use WP_CLI;
-use WP_Error;
+use Foundry\Database\Model;
 
 /**
- * @template TModel of Database\Model
+ * @template TModel of Model
  * @template TItem
  */
 abstract class Importer {
@@ -26,12 +25,12 @@ abstract class Importer {
 	 *
 	 * @psalm-param TModel $model
 	 * @psalm-param TItem $item
-	 * @psalm-return TModel|WP_Error
+	 * @psalm-return TModel|\WP_Error
 	 * @param Model $model Model object.
 	 * @param mixed $item
-	 * @return Model|WP_Error Modified model on success, or WP_Error object on failure.
+	 * @return Model|\WP_Error Modified model on success, or \WP_Error object on failure.
 	 */
-	abstract protected function prepare_import_item_for_database( Database\Model $model, $item );
+	abstract protected function prepare_import_item_for_database( Model $model, $item );
 
 	/**
 	 * Get an existing model for an import item
@@ -39,16 +38,16 @@ abstract class Importer {
 	 * @param TItem $item Row from the import data.
 	 * @return ?TModel
 	 */
-	abstract protected function get_model_for_item( $item ) : ?Database\Model;
+	abstract protected function get_model_for_item( $item ) : ?Model;
 
 	/**
 	 * Import items.
 	 *
 	 * @psalm-param iterable<int, TItem> $items
-	 * @psalm-return WP_Error|array{ total: int, inserted: int, updated: int }
+	 * @psalm-return \WP_Error|array{ total: int, inserted: int, updated: int }
 	 * @param iterable $items
 	 * @param boolean $dry_run True to skip committing changes to the database.
-	 * @return WP_Error|array
+	 * @return \WP_Error|array
 	 */
 	public function import_items( iterable $items, bool $dry_run = false ) {
 		$model_class = static::get_model();
@@ -69,7 +68,7 @@ abstract class Importer {
 				$model = new $model_class();
 			}
 			$model = $this->prepare_import_item_for_database( $model, $item );
-			if ( is_wp_error( $model ) ) {
+			if ( is_\WP_Error( $model ) ) {
 				return $model;
 			}
 
@@ -77,7 +76,7 @@ abstract class Importer {
 		}
 
 		$db_update = Database\save_many( $models, (bool) $dry_run );
-		if ( is_wp_error( $db_update ) ) {
+		if ( is_\WP_Error( $db_update ) ) {
 			return $db_update;
 		}
 		return $result;
