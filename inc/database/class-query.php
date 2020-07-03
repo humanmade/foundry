@@ -92,7 +92,7 @@ class Query {
 				if ( is_wp_error( $sub_query ) ) {
 					return $sub_query;
 				}
-				$where_string .= " $relation ( " . $sub_query[0] . ' )';
+				$where_string .= sprintf( ' %s ( %s )', $relation, $sub_query[0] );
 				$where_values = array_merge( $where_values, $sub_query[1] );
 			} else {
 				$where = [];
