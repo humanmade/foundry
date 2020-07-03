@@ -55,7 +55,7 @@ class Query {
 	}
 
 	/**
-	 * Undocumented function
+	 * Build the WHERE query from WHERE clauses
 	 *
 	 * @psalm-param TWhereClause $args
 	 * @psalm-return array{ 0: string, 1: list<scalar> }
