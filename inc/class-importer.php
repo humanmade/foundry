@@ -68,7 +68,7 @@ abstract class Importer {
 				$model = new $model_class();
 			}
 			$model = $this->prepare_import_item_for_database( $model, $item );
-			if ( is_\WP_Error( $model ) ) {
+			if ( is_wp_error( $model ) ) {
 				return $model;
 			}
 
@@ -76,7 +76,7 @@ abstract class Importer {
 		}
 
 		$db_update = Database\save_many( $models, (bool) $dry_run );
-		if ( is_\WP_Error( $db_update ) ) {
+		if ( is_wp_error( $db_update ) ) {
 			return $db_update;
 		}
 		return $result;
