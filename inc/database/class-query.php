@@ -6,6 +6,8 @@ use WP_Date_Query;
 use WP_Error;
 
 /**
+ * @template TModel of class-string<Model>
+ *
  * @psalm-type TWhereDateFieldQuery = array {
  *    compare: '<'|'<='|'>'|'>='|'='|'!='|'IN'|'NOT IN'|'BETWEEN'|'NOT BETWEEN',
  *    year: int|list<int>,
@@ -21,31 +23,80 @@ use WP_Error;
  *    inclusive: bool
  * }
  *
- * @psalm-type TWhereFieldQuery = array {
+ * @psalm-type TWhereScalarFieldQuery = array {
  *    compare: '<'|'<='|'>'|'>='|'='|'!='|'LIKE',
- *    value: int|float|string|bool
- * }|scalar|TWhereDateFieldQuery
+ *    value: scalar
+ * }
+ *
+ * @psalm-type TWhereFieldQuery = scalar|TWhereDateFieldQuery|TWhereScalarFieldQuery
  *
  * @psalm-type TWhereClause = array {
- *     relation?: 'OR'|'AND',
+ *     relation: 'OR'|'AND',
  *     fields: array<array-key, TWhereFieldQuery>
- * }|array<array-key, TWhereFieldQuery>
+ * }
+ *
+ * @psalm-type TLooseWhereClause = TWhereClause|array<array-key, TWhereFieldQuery>
+ *
+ * @psalm-type TSchema = array {
+ *     fields: array<array-key, string>,
+ *     indexes?: array<array-key, string>
+ * }
+ *
+ * @psalm-type TQueryArgs = array {
+ *     page?: int,
+ *     per_page?: int,
+ * }
+ *
+ * @psalm-type TConfig = array {
+ *      model: string,
+ *      table: string,
+ *      schema: TSchema,
+ * }
  */
 class Query {
+	/**
+	 * @psalm-var TConfig
+	 * @var array
+	 */
 	protected $config;
+
+	/**
+	 * @var TQueryArgs
+	 */
 	protected $args;
 
+	/**
+	 * @var TLooseWhereClause
+	 */
+	protected $where;
+
+	/**
+	 * @var bool
+	 */
 	protected $executed = false;
+
+	/**
+	 * @var ?int
+	 */
 	protected $total = null;
 
-	protected $query;
-
-	public function __construct( array $config, array $args ) {
+	/**
+	 * @psalm-param TConfig $config
+	 *
+	 * @psalm-param TLooseWhereClause $where
+	 * @psalm-param TQueryArgs $args
+	 *
+	 * @param array $config
+	 * @param array $where
+	 * @param array $args
+	 */
+	public function __construct( array $config, array $where, array $args ) {
 		$this->config = $config;
 		$this->args = $args;
+		$this->where = $where;
 	}
 
-	public function get_args() {
+	public function get_args() : array {
 		return $this->args;
 	}
 
@@ -57,8 +108,8 @@ class Query {
 	/**
 	 * Build the WHERE query from WHERE clauses
 	 *
-	 * @psalm-param TWhereClause $args
-	 * @psalm-return array{ 0: string, 1: list<scalar> }
+	 * @psalm-param TLooseWhereClause $args
+	 * @psalm-return array{ 0: string, 1: list<scalar> }|WP_Error
 	 *
 	 * @param array $args
 	 * @return array|WP_Error
@@ -76,6 +127,9 @@ class Query {
 			];
 		}
 
+		/** @var TWhereClause */
+		$args = $args;
+
 		$fields = $this->config['schema']['fields'];
 		$relation = $args['relation'];
 
@@ -83,6 +137,7 @@ class Query {
 		// where conditions, because each WHERE condition can have a different relations (AND / OR / nesting)
 		// that makes the array of clauses approach impractical.
 		$where_string = '';
+
 		$args = $args['fields'];
 		foreach ( $args as $key => $query ) {
 			// Any "field" that is actually just an array with a numeric key is a
@@ -94,39 +149,15 @@ class Query {
 				}
 				$where_string .= sprintf( ' %s ( %s )', $relation, $sub_query[0] );
 				$where_values = array_merge( $where_values, $sub_query[1] );
-			} else {
+			} elseif ( is_string( $key ) ) {
 				$where = [];
-				// TODO: this is not supported since we switched to loop over the fields in the query, rather
-				// than all known fields. We'll need to instead reverse $field*__in` etc to $field, and create
-				// the query accordingly.
-				$key_in = sprintf( '%s__in', $key );
-				$key_not_in = sprintf( '%s__not_in', $key );
-
-				if ( isset( $args[ $key_in ] ) ) {
-					$where[] = sprintf(
-						'`%s` IN ( %s )',
-						$key,
-						$this->repeat_placeholders( (array) $args[ $key_in ] )
-					);
-					$where_values = array_merge( $where_values, array_values( (array) $args[ $key_in ] ) );
-				}
-
-				if ( isset( $args[ $key_not_in ] ) ) {
-					$where[] = sprintf(
-						'`%s` NOT IN ( %s )',
-						$key,
-						$this->repeat_placeholders( (array) $args[ $key_not_in ] )
-					);
-					$where_values = array_merge( $where_values, array_values( (array) $args[ $key_not_in ] ) );
-				}
-
 				if ( isset( $args[ $key ] ) ) {
 					$query_where = $this->build_where_for_field_where_clause( $key, $args[ $key ] );
 					if ( is_wp_error( $query_where ) ) {
 						return $query_where;
 					}
 
-					$where = array_merge( $where, $query_where[0] );
+					array_push( $where, $query_where[0] );
 					$where_values = array_merge( $where_values, $query_where[1] );
 				}
 
@@ -135,6 +166,9 @@ class Query {
 		}
 
 		$where_string = substr( $where_string, strlen( $relation ) + 1 );
+		if ( $where_string === false ) {
+			return [ '', [] ];
+		}
 		return [ $where_string, $where_values ];
 	}
 
@@ -142,7 +176,7 @@ class Query {
 	 * Get the WHERE SQL clause for a single column and value.
 	 *
 	 * @psalm-param TWhereFieldQuery $clause
-	 * @psalm-return array{ 0: string, 1: list<mixed> }|WP_Error
+	 * @psalm-return array{ 0: string, 1: list<scalar> }|WP_Error
 	 *
 	 * @param string $field The field/column name
 	 * @param mixed $clause
@@ -158,11 +192,18 @@ class Query {
 
 		// Use WP_Date_Query for date columns.
 		if ( $fields[ $field ] === 'date' ) {
+			/** @var TWhereDateFieldQuery $clause */
+			$clause = $clause;
 			$date_query = new WP_Date_Query( $clause, $this->config['table'] . '.' . $field );
 			$sql = $date_query->get_sql();
 			// Remove the WP_Date_Query "AND" top level relation.
 			$where = substr( $sql, 5 );
+			if ( $where === false ) {
+				return new WP_Error( 'date-query-sql-error', 'SQL error in Date Query' );
+			}
 		} else {
+			/** @var TWhereScalarFieldQuery */
+			$where_item = $where_item;
 			switch ( $where_item['compare'] ) {
 				case '>':
 				case '>=':
@@ -177,23 +218,31 @@ class Query {
 						$where_item['compare']
 					);
 					$where_values[] = $where_item['value'];
-				break;
+					break;
 			}
 		}
 
 		return [ $where, $where_values ];
 	}
 
-	protected function build_query( array $extra_args = [] ) : string {
+	/**
+	 * @psalm-param TLooseWhereClause $extra_args
+	 *
+	 * @param array $extra_args
+	 * @return string|WP_Error
+	 */
+	protected function build_query() {
 		/** @var \wpdb $wpdb */
 		global $wpdb;
 
-		$args = array_merge( $this->args, $extra_args );
+		$args = $this->args;
 
-		$where = [];
-		$where_values = [];
+		$where = $this->build_where( $this->where );
+		if ( is_wp_error( $where ) ) {
+			return $where;
+		}
 
-		list( $where_string, $where_values ) = $this->build_where( $args );
+		list( $where_string, $where_values ) = $where;
 		$where_statement = empty( $where_string ) ? '' : 'WHERE ' . $where_string;
 
 		$page = $args['page'] ?? 1;
@@ -214,6 +263,9 @@ class Query {
 		);
 
 		$prepared = empty( $values ) ? $query : $wpdb->prepare( $query, $values );
+		if ( ! $prepared ) {
+			return new WP_Error( 'prepare-failed', 'Preparing values failed.' );
+		}
 		return $prepared;
 	}
 
@@ -226,6 +278,10 @@ class Query {
 		/** @var \wpdb $wpdb */
 		global $wpdb;
 		$query = $this->build_query();
+		if ( is_wp_error( $query ) ) {
+			return $query;
+		}
+		/** @var list<object> */
 		$results = $wpdb->get_results( $query );
 		$this->executed = true;
 
