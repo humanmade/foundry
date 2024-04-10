@@ -300,12 +300,12 @@ abstract class Command {
 			'page' => 1,
 		];
 
-		$query_args = array_merge( $defaults, $assoc_args );
+		$opts = array_merge( $defaults, $assoc_args );
 
 		$model = static::get_model();
 
 		/** @var \Foundry\Database\Query|WP_Error $query */
-		$query = $model::query( $query_args );
+		$query = $model::query( $assoc_args, $opts );
 		if ( is_wp_error( $query ) ) {
 			WP_CLI::error( sprintf( 'Could not query (%s)', $query->get_error_message() ) );
 		}

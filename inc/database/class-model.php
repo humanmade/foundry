@@ -32,13 +32,13 @@ abstract class Model {
 		$this->data = $data;
 	}
 
-	public static function query( array $args ) : Query {
+	public static function query( array $where, array $args = [] ) : Query {
 		$config = [
 			'model' => get_called_class(),
 			'table' => static::get_table_name(),
 			'schema' => static::get_table_schema(),
 		];
-		return new Query( $config, $args );
+		return new Query( $config, $where, $args );
 	}
 
 	/**
