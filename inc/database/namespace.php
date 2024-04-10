@@ -197,6 +197,11 @@ function parse_index( string $index ) : ?array {
 		$name = 'PRIMARY';
 	}
 
+	// Use the columns if no name is explicitly set.
+	if ( empty( $name ) ) {
+		$name = $parts['index_columns'];
+	}
+
 	return [
 		'type' => $type,
 		'name' => $name,
