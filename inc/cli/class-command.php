@@ -46,6 +46,9 @@ abstract class Command {
 	 * Register the CLI command.
 	 */
 	public static function register() {
+		// Lazily-load our namespace functions.
+		require_once __DIR__ . '/namespace.php';
+
 		if ( ! is_subclass_of( static::get_model(), Model::class ) ) {
 			trigger_error(
 				'Model classes must extend Model',
