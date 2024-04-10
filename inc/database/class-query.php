@@ -96,6 +96,11 @@ class Query {
 		$this->where = $where;
 	}
 
+	/**
+	 * @psalm-return TQueryArgs
+	 *
+	 * @return array
+	 */
 	public function get_args() : array {
 		return $this->args;
 	}
