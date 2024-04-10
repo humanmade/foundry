@@ -105,7 +105,6 @@ function conform_table( string $name, array $schema ) {
 		$missing_indexes[ $parsed['name'] ] = $index;
 	}
 
-	header( 'Content-Type: text/plain' );
 	$existing_indexes = $wpdb->get_results( sprintf( 'SHOW INDEX FROM %s;', $name ) );
 
 	foreach ( $existing_indexes as $index ) {
