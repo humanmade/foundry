@@ -30,7 +30,7 @@ trait WithRelationships {
 
 		switch ( $relation['type'] ) {
 			case 'has_many':
-				$relationship = new HasManyAssociation( static::get_table_name()  . '_relationships', $this, $relation['model'] );
+				$relationship = new HasManyAssociation( static::get_table_name()  . '_relationships', $this, $type, $relation['model'] );
 				break;
 
 			// case 'has_one':
@@ -66,12 +66,13 @@ trait WithRelationships {
 				$table_name = static::get_table_name()  . '_relationships';
 				$schema = [
 					'fields' => [
+						'relationship' => 'varchar(255) NOT NULL',
 						'left_id' => 'bigint(20) unsigned NOT NULL',
 						'right_id' => 'bigint(20) unsigned NOT NULL',
 					],
 					'indexes' => [
-						'PRIMARY KEY (left_id, right_id)',
-						'KEY (right_id)',
+						'PRIMARY KEY (relationship, left_id, right_id)',
+						'KEY (relationship, right_id)',
 					],
 				];
 

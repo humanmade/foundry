@@ -6,6 +6,7 @@ use Foundry\Database\Model;
 
 trait ManyToMany {
 	abstract protected function get_relationship_table_name() : string;
+	abstract protected function get_relationship_id() : string;
 	abstract protected function get_left_model() : string;
 	abstract protected function get_right_model() : string;
 
@@ -18,7 +19,8 @@ trait ManyToMany {
 
 		$table = $this->get_relationship_table_name();
 		return $wpdb->get_col( $wpdb->prepare(
-			"SELECT `left_id` FROM `$table` WHERE right_id = %d",
+			"SELECT `left_id` FROM `$table` WHERE relationship = %s AND right_id = %d",
+			$this->get_relationship_id(),
 			$right->get_id()
 		) );
 	}
@@ -39,7 +41,8 @@ trait ManyToMany {
 
 		$table = $this->get_relationship_table_name();
 		return $wpdb->get_col( $wpdb->prepare(
-			"SELECT `right_id` FROM `$table` WHERE left_id = %d",
+			"SELECT `right_id` FROM `$table` WHERE relationship = %s AND left_id = %d",
+			$this->get_relationship_id(),
 			$left->get_id()
 		) );
 	}
@@ -56,10 +59,12 @@ trait ManyToMany {
 		$result = $wpdb->insert(
 			$this->get_relationship_table_name(),
 			[
+				'relationship' => $this->get_relationship_id(),
 				'left_id' => $left->get_id(),
 				'right_id' => $right->get_id(),
 			],
 			[
+				'%s',
 				'%d',
 				'%d',
 			]
@@ -71,10 +76,12 @@ trait ManyToMany {
 		$result = $wpdb->delete(
 			$this->get_relationship_table_name(),
 			[
+				'relationship' => $this->get_relationship_id(),
 				'left_id' => $left->get_id(),
 				'right_id' => $right->get_id(),
 			],
 			[
+				'%s',
 				'%d',
 				'%d'
 			]

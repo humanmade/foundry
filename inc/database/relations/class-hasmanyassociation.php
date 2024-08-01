@@ -14,16 +14,24 @@ class HasManyAssociation {
 	protected $parent;
 
 	/** @var string */
+	protected $id;
+
+	/** @var string */
 	protected $child_model;
 
-	public function __construct( string $table, Model $parent, string $child_model ) {
+	public function __construct( string $table, Model $parent, string $id, string $child_model ) {
 		$this->table = $table;
 		$this->parent = $parent;
+		$this->id = $id;
 		$this->child_model = $child_model;
 	}
 
 	protected function get_relationship_table_name() : string {
 		return $this->table;
+	}
+
+	protected function get_relationship_id() : string {
+		return $this->id;
 	}
 
 	protected function get_left_model() : string {
