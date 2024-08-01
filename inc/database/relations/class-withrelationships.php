@@ -3,6 +3,7 @@
 namespace Foundry\Database\Relations;
 
 use Foundry\Database;
+use Foundry\Database\RelationalQuery;
 
 trait WithRelationships {
 	protected $relation_handlers = [];
@@ -56,6 +57,16 @@ trait WithRelationships {
 		}
 
 		return true;
+	}
+
+	public static function query( array $where, array $args = [] ) : Database\Query {
+		$config = [
+			'model' => get_called_class(),
+			'table' => static::get_table_name(),
+			'schema' => static::get_table_schema(),
+			'relationships' => static::get_relationships(),
+		];
+		return new RelationalQuery( $config, $where, $args );
 	}
 
 	protected static function ensure_relationship_table( string $key ) {
