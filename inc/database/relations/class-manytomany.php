@@ -2,14 +2,14 @@
 
 namespace Foundry\Database\Relations;
 
-use Foundry\Database\Idable;
+use Foundry\Database\Model;
 
 trait ManyToMany {
 	abstract protected function get_relationship_table_name() : string;
 	abstract protected function get_left_model() : string;
 	abstract protected function get_right_model() : string;
 
-	protected function get_left_ids( Idable $right ) : array {
+	protected function get_left_ids( Model $right ) : array {
 		global $wpdb;
 		$right_model = $this->get_right_model();
 		if ( ! ( $right instanceof $right_model ) ) {
@@ -23,14 +23,14 @@ trait ManyToMany {
 		) );
 	}
 
-	protected function get_left( Idable $right ) : array {
+	protected function get_left( Model $right ) : array {
 		$ids = $this->get_left_ids( $right );
 		return array_map( function ( int $id ) {
 			return $this->get_left_model()::get( $id );
 		}, $ids );
 	}
 
-	protected function get_right_ids( Idable $left ) : array {
+	protected function get_right_ids( Model $left ) : array {
 		global $wpdb;
 		$left_model = $this->get_left_model();
 		if ( ! ( $left instanceof $left_model ) ) {
@@ -44,14 +44,14 @@ trait ManyToMany {
 		) );
 	}
 
-	protected function get_right( Idable $left ) : array {
+	protected function get_right( Model $left ) : array {
 		$ids = $this->get_right_ids( $left );
 		return array_map( function ( int $id ) {
 			return $this->get_right_model()::get( $id );
 		}, $ids );
 	}
 
-	protected function create_relation( Idable $left, Idable $right ) {
+	protected function create_relation( Model $left, Model $right ) {
 		global $wpdb;
 		$result = $wpdb->insert(
 			$this->get_relationship_table_name(),
@@ -66,7 +66,7 @@ trait ManyToMany {
 		);
 	}
 
-	protected function remove_relation( Idable $left, Idable $right ) {
+	protected function remove_relation( Model $left, Model $right ) {
 		global $wpdb;
 		$result = $wpdb->delete(
 			$this->get_relationship_table_name(),

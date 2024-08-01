@@ -2,7 +2,7 @@
 
 namespace Foundry\Database\Relations;
 
-use Foundry\Database\Idable;
+use Foundry\Database\Model;
 
 class HasManyAssociation {
 	use ManyToMany;
@@ -11,12 +11,12 @@ class HasManyAssociation {
 	protected $table;
 
 	/** @var Model */
-	protected $parent_model;
+	protected $parent;
 
 	/** @var string */
 	protected $child_model;
 
-	public function __construct( string $table, Idable $parent, string $child_model ) {
+	public function __construct( string $table, Model $parent, string $child_model ) {
 		$this->table = $table;
 		$this->parent = $parent;
 		$this->child_model = $child_model;
@@ -38,11 +38,11 @@ class HasManyAssociation {
 		return $this->get_right( $this->parent );
 	}
 
-	public function add( Idable $model ) {
+	public function add( Model $model ) {
 		return $this->create_relation( $this->parent, $model );
 	}
 
-	public function remove( Idable $model ) {
+	public function remove( Model $model ) {
 		return $this->remove_relation( $this->parent, $model );
 	}
 }
