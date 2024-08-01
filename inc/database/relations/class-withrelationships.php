@@ -79,11 +79,11 @@ trait WithRelationships {
 				return Database\ensure_table( $table_name, $schema );
 
 			case 'belongs_to':
-				// Owned by other model, so not needed here.
+				// Handled by fields or something?
 				return true;
 
 			case 'has_one':
-				// Handled by fields or something?
+				// Owned by other model, so not needed here.
 				return true;
 
 			default:
