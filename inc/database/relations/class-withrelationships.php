@@ -48,12 +48,9 @@ trait WithRelationships {
 			return $res;
 		}
 
-		$relationships = static::get_relationships();
-		foreach ( $relationships as $key => $relation ) {
-			$res = static::ensure_relationship_table( $key );
-			if ( $res !== true ) {
-				return $res;
-			}
+		$res = static::ensure_relationship_table( $key );
+		if ( $res !== true ) {
+			return $res;
 		}
 
 		return true;
@@ -70,35 +67,47 @@ trait WithRelationships {
 	}
 
 	protected static function ensure_relationship_table( string $key ) {
+		$created_relationships_table = false;
 		$relationships = static::get_relationships();
-		$relation = $relationships[ $key ];
-		switch ( $relation['type'] ) {
-			case 'has_many':
-				$table_name = static::get_table_name()  . '_relationships';
-				$schema = [
-					'fields' => [
-						'relationship' => 'varchar(255) NOT NULL',
-						'left_id' => 'bigint(20) unsigned NOT NULL',
-						'right_id' => 'bigint(20) unsigned NOT NULL',
-					],
-					'indexes' => [
-						'PRIMARY KEY (relationship, left_id, right_id)',
-						'KEY (relationship, right_id)',
-					],
-				];
+		foreach ( $relationships as $key => $relation ) {
+			switch ( $relation['type'] ) {
+				case 'has_many':
+					if ( $created_relationships_table ) {
+						break;
+					}
 
-				return Database\ensure_table( $table_name, $schema );
+					$table_name = static::get_table_name()  . '_relationships';
+					$schema = [
+						'fields' => [
+							'relationship' => 'varchar(255) NOT NULL',
+							'left_id' => 'bigint(20) unsigned NOT NULL',
+							'right_id' => 'bigint(20) unsigned NOT NULL',
+						],
+						'indexes' => [
+							'PRIMARY KEY (relationship, left_id, right_id)',
+							'KEY (relationship, right_id)',
+						],
+					];
 
-			case 'belongs_to':
-				// Handled by fields or something?
-				return true;
+					$res = Database\ensure_table( $table_name, $schema );
+					if ( $res !== true ) {
+						return $res;
+					}
 
-			case 'has_one':
-				// Owned by other model, so not needed here.
-				return true;
+					$created_relationships_table = true;
+					break;
 
-			default:
-				break;
+				case 'belongs_to':
+					// Handled by fields or something?
+					break;
+
+				case 'has_one':
+					// Owned by other model, so not needed here.
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 }
