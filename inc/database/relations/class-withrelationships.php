@@ -48,7 +48,7 @@ trait WithRelationships {
 			return $res;
 		}
 
-		$res = static::ensure_relationship_table( $key );
+		$res = static::ensure_relationship_table();
 		if ( $res !== true ) {
 			return $res;
 		}
@@ -66,7 +66,7 @@ trait WithRelationships {
 		return new RelationalQuery( $config, $where, $args );
 	}
 
-	protected static function ensure_relationship_table( string $key ) {
+	protected static function ensure_relationship_table() {
 		$created_relationships_table = false;
 		$relationships = static::get_relationships();
 		foreach ( $relationships as $key => $relation ) {
