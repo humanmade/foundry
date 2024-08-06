@@ -126,12 +126,13 @@ class RelationalQuery extends Query {
 					}
 
 					$where = sprintf(
-						'`%1$s`.`relationship` = %2$s AND `%1$s`.`right_id` = %3$d',
+						'`%1$s`.`relationship` = %2$s AND `%1$s`.`right_id` = %2$s',
 						$relations_table,
-						$key,
-						$query
+						'%s',
+						'%d'
 					);
 					$where_string .= ' ' . $relation . ' ' . $where;
+					$where_values[] = $key;
 					$where_values[] = $query;
 					break;
 				default:
