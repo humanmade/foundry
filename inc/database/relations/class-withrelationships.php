@@ -3,6 +3,7 @@
 namespace Foundry\Database\Relations;
 
 use Foundry\Database;
+use Foundry\Database\RelationalQuery;
 
 trait WithRelationships {
 	protected $relation_handlers = [];
@@ -30,7 +31,7 @@ trait WithRelationships {
 
 		switch ( $relation['type'] ) {
 			case 'has_many':
-				$relationship = new HasManyAssociation( static::get_table_name()  . '_relationships', $this, $relation['model'] );
+				$relationship = new HasManyAssociation( static::get_table_name()  . '_relationships', $this, $type, $relation['model'] );
 				break;
 
 			// case 'has_one':
@@ -47,46 +48,66 @@ trait WithRelationships {
 			return $res;
 		}
 
-		$relationships = static::get_relationships();
-		foreach ( $relationships as $key => $relation ) {
-			$res = static::ensure_relationship_table( $key );
-			if ( $res !== true ) {
-				return $res;
-			}
+		$res = static::ensure_relationship_table();
+		if ( $res !== true ) {
+			return $res;
 		}
 
 		return true;
 	}
 
-	protected static function ensure_relationship_table( string $key ) {
+	public static function query( array $where, array $args = [] ) : Database\Query {
+		$config = [
+			'model' => get_called_class(),
+			'table' => static::get_table_name(),
+			'schema' => static::get_table_schema(),
+			'relationships' => static::get_relationships(),
+		];
+		return new RelationalQuery( $config, $where, $args );
+	}
+
+	protected static function ensure_relationship_table() {
+		$created_relationships_table = false;
 		$relationships = static::get_relationships();
-		$relation = $relationships[ $key ];
-		switch ( $relation['type'] ) {
-			case 'has_many':
-				$table_name = static::get_table_name()  . '_relationships';
-				$schema = [
-					'fields' => [
-						'left_id' => 'bigint(20) unsigned NOT NULL',
-						'right_id' => 'bigint(20) unsigned NOT NULL',
-					],
-					'indexes' => [
-						'PRIMARY KEY (left_id, right_id)',
-						'KEY (right_id)',
-					],
-				];
+		foreach ( $relationships as $key => $relation ) {
+			switch ( $relation['type'] ) {
+				case 'has_many':
+					if ( $created_relationships_table ) {
+						break;
+					}
 
-				return Database\ensure_table( $table_name, $schema );
+					$table_name = static::get_table_name()  . '_relationships';
+					$schema = [
+						'fields' => [
+							'relationship' => 'varchar(255) NOT NULL',
+							'left_id' => 'bigint(20) unsigned NOT NULL',
+							'right_id' => 'bigint(20) unsigned NOT NULL',
+						],
+						'indexes' => [
+							'PRIMARY KEY (relationship, left_id, right_id)',
+							'KEY (relationship, right_id)',
+						],
+					];
 
-			case 'belongs_to':
-				// Owned by other model, so not needed here.
-				return true;
+					$res = Database\ensure_table( $table_name, $schema );
+					if ( $res !== true ) {
+						return $res;
+					}
 
-			case 'has_one':
-				// Handled by fields or something?
-				return true;
+					$created_relationships_table = true;
+					break;
 
-			default:
-				break;
+				case 'belongs_to':
+					// Handled by fields or something?
+					break;
+
+				case 'has_one':
+					// Owned by other model, so not needed here.
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@ trait Table {
 	/**
 	 * Ensure the table for the model exists.
 	 *
-	 * @return bool|WP_Error True on succes, error otherwise.
+	 * @return bool|WP_Error True on success, error otherwise.
 	 */
 	public static function ensure_table() {
 		$name = static::get_table_name();

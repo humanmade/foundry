@@ -11,7 +11,7 @@ use WP_Error;
  *
  * @param string $name
  * @param array $schema
- * @return bool|WP_Error True on succes, error otherwise.
+ * @return bool|WP_Error True on success, error otherwise.
  */
 function ensure_table( string $name, array $schema ) {
 	/** @var \wpdb $wpdb */
@@ -22,7 +22,12 @@ function ensure_table( string $name, array $schema ) {
 		return create_table( $name, $schema );
 	}
 
-	return conform_table( $name, $schema );
+	$conformed = conform_table( $name, $schema );
+	if ( is_wp_error( $conformed ) ) {
+		return $conformed;
+	}
+
+	return true;
 }
 
 /**
