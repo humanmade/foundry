@@ -33,7 +33,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 *
 	 * @return void
 	 */
-	public function rewind() {
+	public function rewind() : void {
 		$this->position = 0;
 	}
 
@@ -44,7 +44,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 *
 	 * @return Model
 	 */
-	public function current() {
+	public function current() : Model {
 		$model = $this->config['model'];
 		return new $model( (array) $this->results[ $this->position ] );
 	}
@@ -65,7 +65,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 * @param int $offset
 	 * @return Model|null
 	 */
-	public function offsetGet( $offset ) {
+	public function offsetGet( mixed $offset ) : ?Model {
 		if ( ! isset( $this->results[ $offset ] ) ) {
 			return null;
 		}
@@ -80,7 +80,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 * @param mixed $value
 	 * @return void
 	 */
-	public function offsetSet( $offset, $value ) {
+	public function offsetSet( mixed $offset, mixed $value ) : void {
 	}
 
 	/**
@@ -89,7 +89,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 * @param mixed $offset
 	 * @return void
 	 */
-	public function offsetUnset( $offset ) {
+	public function offsetUnset( mixed $offset ) : void {
 	}
 
 	/**
@@ -106,7 +106,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 *
 	 * @return void
 	 */
-	public function next() {
+	public function next() : void {
 		++$this->position;
 	}
 
@@ -115,7 +115,7 @@ class QueryResults implements ArrayAccess, Countable, Iterator {
 	 *
 	 * @return boolean
 	 */
-	public function valid() {
+	public function valid() : bool {
 		return isset( $this->results[ $this->position ] );
 	}
 
