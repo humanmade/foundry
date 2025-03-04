@@ -1,0 +1,14 @@
+{
+	"name": "humanmade/foundry",
+	"description": "Foundry is an experimental approach to custom tables in WordPress.",
+	"license": "GPL-2.0+",
+	"autoload": {
+		"classmap": [
+			"inc/"
+		],
+		"files": [
+			"inc/cli/namespace.php",
+			"inc/database/namespace.php"
+		]
+	}
+}
