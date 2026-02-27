@@ -13,3 +13,7 @@ require_once $_tests_dir . '/includes/bootstrap.php';
 
 // Load test helpers.
 require_once __DIR__ . '/helpers/class-test-model.php';
+require_once __DIR__ . '/helpers/class-test-child-model.php';
+require_once __DIR__ . '/helpers/class-test-parent-model.php';
+require_once __DIR__ . '/helpers/class-test-importer.php';
+require_once __DIR__ . '/helpers/class-test-controller.php';
