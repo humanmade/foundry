@@ -17,6 +17,9 @@
 		"roots/wordpress-no-content": "^6.0",
 		"yoast/phpunit-polyfills": "^2.0"
 	},
+	"scripts": {
+		"test": "phpunit"
+	},
 	"config": {
 		"allow-plugins": {
 			"roots/wordpress-core-installer": true
