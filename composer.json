@@ -10,5 +10,19 @@
 			"inc/cli/namespace.php",
 			"inc/database/namespace.php"
 		]
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.0",
+		"wp-phpunit/wp-phpunit": "^6.0",
+		"roots/wordpress-no-content": "^6.0",
+		"yoast/phpunit-polyfills": "^2.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"roots/wordpress-core-installer": true
+		}
+	},
+	"extra": {
+		"wordpress-install-dir": "vendor/roots/wordpress-no-content"
 	}
 }
