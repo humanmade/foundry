@@ -71,6 +71,13 @@ class Query {
 	protected $where;
 
 	/**
+	 * ORDER BY clauses.
+	 *
+	 * @var array<string, 'ASC'|'DESC'>
+	 */
+	protected $order_by = [];
+
+	/**
 	 * @var bool
 	 */
 	protected $executed = false;
@@ -103,6 +110,49 @@ class Query {
 	 */
 	public function get_args() : array {
 		return $this->args;
+	}
+
+	/**
+	 * Set ORDER BY clauses.
+	 *
+	 * @param array<string, 'ASC'|'DESC'> $order_by Column => direction pairs.
+	 * @return static
+	 */
+	public function order_by( array $order_by ) : self {
+		$this->order_by = $order_by;
+		return $this;
+	}
+
+	/**
+	 * Build the ORDER BY clause.
+	 *
+	 * Only columns defined in the schema are allowed. Invalid columns
+	 * are silently skipped to prevent SQL injection.
+	 *
+	 * @return string SQL ORDER BY clause or empty string.
+	 */
+	protected function build_order_by() : string {
+		if ( empty( $this->order_by ) ) {
+			return '';
+		}
+
+		$fields = $this->config['schema']['fields'];
+		$clauses = [];
+
+		foreach ( $this->order_by as $column => $direction ) {
+			if ( ! isset( $fields[ $column ] ) ) {
+				continue;
+			}
+
+			$direction = strtoupper( $direction ) === 'DESC' ? 'DESC' : 'ASC';
+			$clauses[] = sprintf( '`%s` %s', $column, $direction );
+		}
+
+		if ( empty( $clauses ) ) {
+			return '';
+		}
+
+		return 'ORDER BY ' . implode( ', ', $clauses );
 	}
 
 	protected function repeat_placeholders( array $values ) : string {
@@ -256,10 +306,13 @@ class Query {
 		$offset = ( $page - 1 ) * $per_page;
 		$limit = $per_page;
 
+		$order_by_statement = $this->build_order_by();
+
 		$query = sprintf(
-			'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` %s LIMIT %d, %d',
+			'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` %s %s LIMIT %d, %d',
 			$this->config['table'],
 			$where_statement,
+			$order_by_statement,
 			$offset,
 			$limit
 		);

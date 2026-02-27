@@ -56,11 +56,14 @@ class RelationalQuery extends Query {
 		}
 		$where_statement = empty( $full_where ) ? '' : 'WHERE ' . $full_where;
 
+		$order_by_statement = $this->build_order_by();
+
 		$query = sprintf(
-			'SELECT SQL_CALC_FOUND_ROWS `%1$s`.* FROM `%1$s` %2$s %3$s LIMIT %4$d, %5$d',
+			'SELECT SQL_CALC_FOUND_ROWS `%1$s`.* FROM `%1$s` %2$s %3$s %4$s LIMIT %5$d, %6$d',
 			$this->config['table'],
 			implode( ' ', $joins ),
 			$where_statement,
+			$order_by_statement,
 			$offset,
 			$limit
 		);
