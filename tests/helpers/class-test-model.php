@@ -3,6 +3,7 @@
 namespace Foundry\Tests;
 
 use Foundry\Database\Model;
+use WP_Error;
 
 class Test_Model extends Model {
 	public static function get_table_name() : string {
@@ -68,6 +69,6 @@ class Test_Model extends Model {
  */
 class Failing_Test_Model extends Test_Model {
 	public function save() {
-		return new \WP_Error( 'test_error', 'Intentional failure' );
+		return new WP_Error( 'test_error', 'Intentional failure' );
 	}
 }

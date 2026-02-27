@@ -4,8 +4,9 @@ namespace Foundry\Tests\Database;
 
 use Foundry\Tests\Test_Model;
 use Foundry\Database\QueryResults;
+use WP_UnitTestCase;
 
-class QueryTest extends \WP_UnitTestCase {
+class QueryTest extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();

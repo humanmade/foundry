@@ -6,8 +6,9 @@ use Foundry\Tests\Test_Model;
 use function Foundry\Database\ensure_table;
 use function Foundry\Database\conform_table;
 use function Foundry\Database\parse_index;
+use WP_UnitTestCase;
 
-class TableTest extends \WP_UnitTestCase {
+class TableTest extends WP_UnitTestCase {
 
 	/**
 	 * Remove the WP test framework's temporary table filters so we can

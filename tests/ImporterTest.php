@@ -2,7 +2,9 @@
 
 namespace Foundry\Tests;
 
-class ImporterTest extends \WP_UnitTestCase {
+use WP_UnitTestCase;
+
+class ImporterTest extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();

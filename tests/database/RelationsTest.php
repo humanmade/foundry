@@ -6,8 +6,9 @@ use Foundry\Tests\Test_Parent_Model;
 use Foundry\Tests\Test_Child_Model;
 use Foundry\Database\Relations\HasManyAssociation;
 use Foundry\Database\RelationalQuery;
+use WP_UnitTestCase;
 
-class RelationsTest extends \WP_UnitTestCase {
+class RelationsTest extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();

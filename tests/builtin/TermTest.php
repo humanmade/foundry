@@ -3,8 +3,11 @@
 namespace Foundry\Tests\Builtin;
 
 use Foundry\Builtin\Term;
+use WP_UnitTestCase;
+use WP_Term;
+use TypeError;
 
-class TermTest extends \WP_UnitTestCase {
+class TermTest extends WP_UnitTestCase {
 
 	public function test_from_term_and_get_id() {
 		$term_data = wp_insert_term( 'Test Tag', 'post_tag' );
@@ -25,7 +28,7 @@ class TermTest extends \WP_UnitTestCase {
 	public function test_from_id_throws_for_invalid() {
 		// get_term() returns null for non-existent IDs; from_id doesn't
 		// guard against null, so from_term() receives null and throws.
-		$this->expectException( \TypeError::class );
+		$this->expectException( TypeError::class );
 		Term::from_id( 999999 );
 	}
 
@@ -36,7 +39,7 @@ class TermTest extends \WP_UnitTestCase {
 		$model = Term::from_term( $wp_term );
 		$result = $model->as_term();
 
-		$this->assertInstanceOf( \WP_Term::class, $result );
+		$this->assertInstanceOf( WP_Term::class, $result );
 		$this->assertEquals( $wp_term->term_id, $result->term_id );
 		$this->assertEquals( 'Roundtrip Tag', $result->name );
 	}

@@ -6,8 +6,9 @@ use Foundry\Tests\Test_Model;
 use Foundry\Tests\Failing_Test_Model;
 use function Foundry\Database\get_primary_column;
 use function Foundry\Database\save_many;
+use WP_UnitTestCase;
 
-class NamespaceFunctionsTest extends \WP_UnitTestCase {
+class NamespaceFunctionsTest extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
