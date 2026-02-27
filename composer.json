@@ -18,7 +18,11 @@
 		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"scripts": {
-		"test": "phpunit"
+		"test": [
+			"@test:db",
+			"phpunit"
+		],
+		"test:db": "mysql -u \"${WP_TESTS_DB_USER:-root}\" -h \"${WP_TESTS_DB_HOST:-localhost}\" -e \"CREATE DATABASE IF NOT EXISTS ${WP_TESTS_DB_NAME:-foundry_tests}\""
 	},
 	"config": {
 		"allow-plugins": {
