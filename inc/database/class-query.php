@@ -45,6 +45,7 @@ use WP_Error;
  * @psalm-type TQueryArgs = array {
  *     page?: int,
  *     per_page?: int,
+ *     order_by?: array<string, 'ASC'|'DESC'>,
  * }
  *
  * @psalm-type TConfig = array {
@@ -231,6 +232,40 @@ class Query {
 	}
 
 	/**
+	 * Build the ORDER BY clause from args.
+	 *
+	 * Only columns defined in the schema are allowed. Invalid columns
+	 * are silently skipped to prevent SQL injection.
+	 *
+	 * @return string SQL ORDER BY clause or empty string.
+	 */
+	protected function build_order_by() : string {
+		$order_by = $this->args['order_by'] ?? [];
+
+		if ( empty( $order_by ) ) {
+			return '';
+		}
+
+		$fields = $this->config['schema']['fields'];
+		$clauses = [];
+
+		foreach ( $order_by as $column => $direction ) {
+			if ( ! isset( $fields[ $column ] ) ) {
+				continue;
+			}
+
+			$direction = strtoupper( $direction ) === 'DESC' ? 'DESC' : 'ASC';
+			$clauses[] = sprintf( '`%s` %s', $column, $direction );
+		}
+
+		if ( empty( $clauses ) ) {
+			return '';
+		}
+
+		return 'ORDER BY ' . implode( ', ', $clauses );
+	}
+
+	/**
 	 * @psalm-param TLooseWhereClause $extra_args
 	 *
 	 * @param array $extra_args
@@ -256,10 +291,13 @@ class Query {
 		$offset = ( $page - 1 ) * $per_page;
 		$limit = $per_page;
 
+		$order_by_statement = $this->build_order_by();
+
 		$query = sprintf(
-			'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` %s LIMIT %d, %d',
+			'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` %s %s LIMIT %d, %d',
 			$this->config['table'],
 			$where_statement,
+			$order_by_statement,
 			$offset,
 			$limit
 		);
