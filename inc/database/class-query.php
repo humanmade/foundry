@@ -194,7 +194,10 @@ class Query {
 		$where = [];
 		$where_values = [];
 
-		$where_item = is_array( $clause ) ? $clause : [ 'compare' => '=', 'value' => $clause ];
+		$where_item = is_array( $clause ) ? $clause : [
+			'compare' => '=',
+			'value'   => $clause,
+		];
 
 		// Use WP_Date_Query for date columns.
 		if ( $fields[ $field ] === 'date' ) {
@@ -305,7 +308,7 @@ class Query {
 			$where_values
 		);
 
-		$prepared = empty( $values ) ? $query : $wpdb->prepare( $query, $values );
+		$prepared = empty( $values ) ? $query : $wpdb->prepare( $query, $values ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		if ( ! $prepared ) {
 			return new WP_Error( 'prepare-failed', 'Preparing values failed.' );
 		}
@@ -325,14 +328,14 @@ class Query {
 			return $query;
 		}
 		/** @var list<object> */
-		$results = $wpdb->get_results( $query );
+		$results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$this->executed = true;
 
 		if ( $wpdb->last_error ) {
 			return new WP_Error( 'foundry.database.query.could_not_execute', $wpdb->last_error );
 		}
 
-		$total = (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
+		$total = (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return new QueryResults( $this->config, $results, $total );
 	}
 }
