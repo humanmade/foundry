@@ -171,16 +171,16 @@ function parse_index( string $index ) : ?array {
 		. ')'
 		. '\s+'                         // Followed by at least one white space character.
 		. '(?:'                         // Name of the index. Optional if type is PRIMARY KEY.
-		. '`?'                      // Name can be escaped with a backtick.
-		. '(?P<index_name>'     // 2) Name of the index.
+		. '`?'                          // Name can be escaped with a backtick.
+		. '(?P<index_name>'             // 2) Name of the index.
 		. '(?:[0-9a-zA-Z$_-]|[\xC2-\xDF][\x80-\xBF])+'
 		. ')'
-		. '`?'                      // Name can be escaped with a backtick.
-		. '\s+'                     // Followed by at least one white space character.
+		. '`?'                          // Name can be escaped with a backtick.
+		. '\s+'                         // Followed by at least one white space character.
 		. ')*'
 		. '\('                          // Opening bracket for the columns.
 		. '(?P<index_columns>'
-		. '.+?'                 // 3) Column names, index prefixes, and orders.
+		. '.+?'                         // 3) Column names, index prefixes, and orders.
 		. ')'
 		. '\)'                          // Closing bracket for the columns.
 		. '$/im',
