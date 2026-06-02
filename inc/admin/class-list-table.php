@@ -2,7 +2,6 @@
 
 namespace Foundry\Admin;
 
-use Foundry\Database\Model;
 use Foundry\Database\Query;
 use WP_List_Table;
 
@@ -37,7 +36,7 @@ abstract class List_Table extends WP_List_Table {
 	 * Data returned from this method is output directly to the browser, and so
 	 * must be escaped by your method (using esc_html() or similar).
 	 *
-	 * @param Model $model Model object.
+	 * @param \Foundry\Database\Model $model Model object.
 	 * @return array|WP_Error Data array on success, or WP_Error object on failure.
 	 */
 	abstract protected function prepare_model_for_output( $model );
@@ -51,7 +50,7 @@ abstract class List_Table extends WP_List_Table {
 	 *
 	 * By default, the item's internal ID is displayed.
 	 *
-	 * @param Model $model Model object.
+	 * @param \Foundry\Database\Model $model Model object.
 	 */
 	protected function prepare_actions_for_output( $model ) {
 		$actions = [];
@@ -90,7 +89,7 @@ abstract class List_Table extends WP_List_Table {
 	/**
 	 * Get all columns to display in the list table.
 	 *
-	 * Derived from 
+	 * Derived from
 	 */
 	public function get_columns() {
 		$schema = static::get_item_schema();
