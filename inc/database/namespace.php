@@ -58,7 +58,7 @@ function create_table( string $name, array $schema ) {
 	);
 
 	$prev = $wpdb->suppress_errors();
-	$result = $wpdb->query( $statement );
+	$result = $wpdb->query( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	$wpdb->suppress_errors( $prev );
 
 	if ( $result === true ) {
@@ -87,9 +87,9 @@ function conform_table( string $name, array $schema ) {
 
 	// Find any missing columns.
 	$missing_fields = $schema['fields'];
-	$existing_fields = $wpdb->get_results( sprintf( 'DESCRIBE %s;', $name ) );
+	$existing_fields = $wpdb->get_results( 'DESCRIBE `' . esc_sql( $name ) . '`;', ARRAY_A );
 	foreach ( $existing_fields as $row ) {
-		$key = $row->Field;
+		$key = $row['Field'];
 		unset( $missing_fields[ $key ] );
 	}
 
@@ -110,10 +110,10 @@ function conform_table( string $name, array $schema ) {
 		$missing_indexes[ $parsed['name'] ] = $index;
 	}
 
-	$existing_indexes = $wpdb->get_results( sprintf( 'SHOW INDEX FROM %s;', $name ) );
+	$existing_indexes = $wpdb->get_results( 'SHOW INDEX FROM `' . esc_sql( $name ) . '`;', ARRAY_A );
 
 	foreach ( $existing_indexes as $index ) {
-		$key = $index->Key_name;
+		$key = $index['Key_name'];
 		unset( $missing_indexes[ $key ] );
 	}
 
@@ -144,7 +144,7 @@ function conform_table( string $name, array $schema ) {
 	);
 
 	$prev = $wpdb->suppress_errors();
-	$result = $wpdb->query( $statement );
+	$result = $wpdb->query( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	$wpdb->suppress_errors( $prev );
 
 	if ( $result === true ) {
@@ -166,23 +166,23 @@ function parse_index( string $index ) : ?array {
 
 	$res = preg_match(
 		'/^'
-		.   '(?P<index_type>'             // 1) Type of the index.
-		.       'PRIMARY\s+KEY|(?:UNIQUE|FULLTEXT|SPATIAL)\s+(?:KEY|INDEX)|KEY|INDEX'
-		.   ')'
-		.   '\s+'                         // Followed by at least one white space character.
-		.   '(?:'                         // Name of the index. Optional if type is PRIMARY KEY.
-		.       '`?'                      // Name can be escaped with a backtick.
-		.           '(?P<index_name>'     // 2) Name of the index.
-		.               '(?:[0-9a-zA-Z$_-]|[\xC2-\xDF][\x80-\xBF])+'
-		.           ')'
-		.       '`?'                      // Name can be escaped with a backtick.
-		.       '\s+'                     // Followed by at least one white space character.
-		.   ')*'
-		.   '\('                          // Opening bracket for the columns.
-		.       '(?P<index_columns>'
-		.           '.+?'                 // 3) Column names, index prefixes, and orders.
-		.       ')'
-		.   '\)'                          // Closing bracket for the columns.
+		. '(?P<index_type>'             // 1) Type of the index.
+		. 'PRIMARY\s+KEY|(?:UNIQUE|FULLTEXT|SPATIAL)\s+(?:KEY|INDEX)|KEY|INDEX'
+		. ')'
+		. '\s+'                         // Followed by at least one white space character.
+		. '(?:'                         // Name of the index. Optional if type is PRIMARY KEY.
+		. '`?'                      // Name can be escaped with a backtick.
+		. '(?P<index_name>'     // 2) Name of the index.
+		. '(?:[0-9a-zA-Z$_-]|[\xC2-\xDF][\x80-\xBF])+'
+		. ')'
+		. '`?'                      // Name can be escaped with a backtick.
+		. '\s+'                     // Followed by at least one white space character.
+		. ')*'
+		. '\('                          // Opening bracket for the columns.
+		. '(?P<index_columns>'
+		. '.+?'                 // 3) Column names, index prefixes, and orders.
+		. ')'
+		. '\)'                          // Closing bracket for the columns.
 		. '$/im',
 		$trimmed,
 		$parts
@@ -210,7 +210,7 @@ function parse_index( string $index ) : ?array {
 	return [
 		'type' => $type,
 		'name' => $name,
-		'columns' => $parts['index_columns']
+		'columns' => $parts['index_columns'],
 	];
 }
 
