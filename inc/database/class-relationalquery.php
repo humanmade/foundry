@@ -72,7 +72,7 @@ class RelationalQuery extends Query {
 			$join_where_values
 		);
 
-		$prepared = empty( $values ) ? $query : $wpdb->prepare( $query, $values );
+		$prepared = empty( $values ) ? $query : $wpdb->prepare( $query, $values ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		if ( ! $prepared ) {
 			return new WP_Error( 'prepare-failed', 'Preparing values failed.' );
 		}

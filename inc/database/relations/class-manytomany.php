@@ -19,7 +19,7 @@ trait ManyToMany {
 
 		$table = $this->get_relationship_table_name();
 		return $wpdb->get_col( $wpdb->prepare(
-			"SELECT `left_id` FROM `$table` WHERE relationship = %s AND right_id = %d",
+			'SELECT `left_id` FROM `' . esc_sql( $table ) . '` WHERE relationship = %s AND right_id = %d',
 			$this->get_relationship_id(),
 			$right->get_id()
 		) );
@@ -41,7 +41,7 @@ trait ManyToMany {
 
 		$table = $this->get_relationship_table_name();
 		return $wpdb->get_col( $wpdb->prepare(
-			"SELECT `right_id` FROM `$table` WHERE relationship = %s AND left_id = %d",
+			'SELECT `right_id` FROM `' . esc_sql( $table ) . '` WHERE relationship = %s AND left_id = %d',
 			$this->get_relationship_id(),
 			$left->get_id()
 		) );
@@ -83,7 +83,7 @@ trait ManyToMany {
 			[
 				'%s',
 				'%d',
-				'%d'
+				'%d',
 			]
 		);
 	}

@@ -4,7 +4,6 @@ namespace Foundry\Cli;
 
 use Foundry\Database\Model;
 use WP_CLI;
-use WP_CLI\Formatter;
 use WP_CLI\Iterators\Transform;
 use WP_Error;
 
@@ -86,6 +85,7 @@ abstract class Command {
 		if ( ! empty( $required ) ) {
 			WP_CLI::error(
 				sprintf(
+					/* translators: %s: Comma-separated list of missing argument names. */
 					__( 'Missing args(s): %s' ),
 					implode( ', ', $required )
 				)

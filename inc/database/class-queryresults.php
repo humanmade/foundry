@@ -2,8 +2,8 @@
 
 namespace Foundry\Database;
 
-use Countable;
 use ArrayAccess;
+use Countable;
 use Iterator;
 
 class QueryResults implements ArrayAccess, Countable, Iterator {

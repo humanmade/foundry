@@ -295,8 +295,12 @@ abstract class Model {
 		$schema = static::get_table_schema();
 		$primary = get_primary_column( $schema );
 
-		$query = "SELECT * FROM `$table` WHERE `$primary` = %d LIMIT 1";
-		$prepared = $wpdb->prepare( $query, $id );
-		return $wpdb->get_row( $prepared, ARRAY_A );
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM `' . esc_sql( $table ) . '` WHERE `' . esc_sql( $primary ) . '` = %d LIMIT 1',
+				$id
+			),
+			ARRAY_A
+		);
 	}
 }

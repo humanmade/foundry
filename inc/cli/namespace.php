@@ -51,7 +51,7 @@ function open_file_or_stdin( $arg ) {
 	} else {
 		$readfile = 'php://stdin';
 	}
-	return fopen( $readfile, 'r' );
+	return fopen( $readfile, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
 }
 
 function parse_assoc_arg( $value, $schema, $param ) {

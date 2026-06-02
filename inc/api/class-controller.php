@@ -3,7 +3,6 @@
 namespace Foundry\Api;
 
 use Foundry\Database\Model;
-use Foundry\Database\QueryResults;
 use WP_Error;
 use WP_Http;
 use WP_REST_Controller;
@@ -93,9 +92,9 @@ abstract class Controller extends WP_REST_Controller {
 	 * @return array Route specification, used in {@see register_routes}
 	 */
 	protected function get_routes() {
-		$get_item_args = array(
+		$get_item_args = [
 			'context' => $this->get_context_param( [ 'default' => 'view' ] ),
-		);
+		];
 
 		return [
 			$this->rest_base => [
@@ -114,12 +113,12 @@ abstract class Controller extends WP_REST_Controller {
 				'schema' => [ $this, 'get_public_item_schema' ],
 			],
 			$this->rest_base . '/(?P<id>\d+)' => [
-				'args' => array(
-					'id' => array(
+				'args' => [
+					'id' => [
 						'description' => __( 'Unique identifier for the object.' ),
 						'type'        => 'integer',
-					),
-				),
+					],
+				],
 				[
 					'methods' => WP_REST_Server::READABLE,
 					'callback' => [ $this, 'get_item' ],
@@ -137,8 +136,8 @@ abstract class Controller extends WP_REST_Controller {
 					'callback' => [ $this, 'delete_item' ],
 					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 				],
-				'schema' => array( $this, 'get_public_item_schema' ),
-			]
+				'schema' => [ $this, 'get_public_item_schema' ],
+			],
 		];
 	}
 
@@ -272,7 +271,7 @@ abstract class Controller extends WP_REST_Controller {
 	 */
 	public function create_item( $request ) {
 		if ( ! empty( $request['id'] ) ) {
-			return new WP_Error( 'foundry.api.cannot_create_existing', 'Cannot create existing item.', array( 'status' => 400 ) );
+			return new WP_Error( 'foundry.api.cannot_create_existing', 'Cannot create existing item.', [ 'status' => 400 ] );
 		}
 
 		$model = $this->get_model();
@@ -282,7 +281,7 @@ abstract class Controller extends WP_REST_Controller {
 		}
 
 		if ( ! $item->is_new() ) {
-			return new WP_Error( 'foundry.api.cannot_create_existing', 'Cannot create existing item.', array( 'status' => 400 ) );
+			return new WP_Error( 'foundry.api.cannot_create_existing', 'Cannot create existing item.', [ 'status' => 400 ] );
 		}
 
 		$result = $item->save();
