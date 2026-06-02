@@ -2,8 +2,6 @@
 
 namespace Foundry\Admin;
 
-use Foundry\Database\Model;
-
 trait WithActions {
 	/**
 	 * Get the actions for the model.
@@ -59,7 +57,7 @@ trait WithActions {
 	 * use PHP's `use` resolution, or call
 	 * `prepare_automatic_actions_for_output()` directly.
 	 *
-	 * @param Model $model
+	 * @param \Foundry\Database\Model $model
 	 * @return array
 	 */
 	protected function prepare_actions_for_output( $model ) {
