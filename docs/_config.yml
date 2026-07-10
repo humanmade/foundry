@@ -1,0 +1,55 @@
+# Site configuration for GitHub Pages.
+# Serve from: Settings → Pages → Deploy from a branch → main → /docs
+
+title: Foundry
+tagline: Custom database tables for WordPress
+description: >-
+  Foundry is a developer library that makes custom database tables in
+  WordPress as easy as custom post types — with full control, no magic.
+
+url: "https://humanmade.github.io"
+baseurl: "/foundry"
+
+repository: humanmade/foundry
+github_url: https://github.com/humanmade/foundry
+
+markdown: kramdown
+permalink: pretty
+
+# These are enabled by default on GitHub Pages; listed explicitly so local
+# builds behave the same way. They let the plain markdown docs render as
+# pages without needing front matter.
+plugins:
+  - jekyll-optional-front-matter
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
+  - jekyll-relative-links
+
+optional_front_matter:
+  remove_originals: true
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: page
+
+# Ordered documentation navigation, used by the sidebar and pager.
+docs_nav:
+  - title: Design
+    url: /design/
+  - title: Example Project
+    url: /example/
+  - title: Relationships
+    url: /relationships/
+  - title: "Decorator: REST API"
+    url: /decorator-api/
+  - title: "Decorator: CLI"
+    url: /decorator-cli/
+  - title: "Decorator: List Table"
+    url: /decorator-list-table/
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

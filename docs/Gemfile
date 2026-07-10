@@ -1,0 +1,7 @@
+# For previewing the site locally:
+#   cd docs && bundle install && bundle exec jekyll serve
+# GitHub Pages itself doesn't use this file; it builds with the
+# github-pages gem automatically.
+source "https://rubygems.org"
+
+gem "github-pages", group: :jekyll_plugins

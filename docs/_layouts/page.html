@@ -1,0 +1,57 @@
+---
+layout: default
+---
+<div class="wrap docs-wrap">
+	<aside class="docs-sidebar">
+		<nav aria-label="Documentation">
+			<p class="docs-sidebar-title">Documentation</p>
+			<ul>
+				{% for item in site.docs_nav %}
+				<li>
+					<a href="{{ item.url | relative_url }}"{% if item.url == page.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
+				</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	</aside>
+
+	<main class="docs-content">
+		<article class="prose">
+			{{ content }}
+		</article>
+
+		{% assign current_index = nil %}
+		{% for item in site.docs_nav %}
+			{% if item.url == page.url %}
+				{% assign current_index = forloop.index0 %}
+			{% endif %}
+		{% endfor %}
+		{% if current_index %}
+		<nav class="docs-pager" aria-label="Documentation pages">
+			{% if current_index > 0 %}
+				{% assign prev_index = current_index | minus: 1 %}
+				{% assign prev = site.docs_nav[prev_index] %}
+				<a class="pager-prev" href="{{ prev.url | relative_url }}">
+					<span class="pager-label">Previous</span>
+					<span class="pager-title">{{ prev.title }}</span>
+				</a>
+			{% else %}
+				<span></span>
+			{% endif %}
+			{% assign last_index = site.docs_nav.size | minus: 1 %}
+			{% if current_index < last_index %}
+				{% assign next_index = current_index | plus: 1 %}
+				{% assign next = site.docs_nav[next_index] %}
+				<a class="pager-next" href="{{ next.url | relative_url }}">
+					<span class="pager-label">Next</span>
+					<span class="pager-title">{{ next.title }}</span>
+				</a>
+			{% endif %}
+		</nav>
+		{% endif %}
+
+		<p class="docs-edit">
+			<a href="{{ site.github_url }}/edit/main/docs/{{ page.path }}">Edit this page on GitHub</a>
+		</p>
+	</main>
+</div>

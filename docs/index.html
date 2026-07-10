@@ -1,0 +1,291 @@
+---
+layout: default
+---
+<main>
+
+	<section class="hero">
+		<div class="wrap hero-inner">
+			<div class="hero-copy">
+				<p class="hero-badge"><span class="badge-dot" aria-hidden="true"></span> Experimental — not yet production-ready</p>
+				<h1>Your data isn&rsquo;t a&nbsp;post.<br><em>Stop storing it like&nbsp;one.</em></h1>
+				<p class="hero-sub">
+					Foundry brings real database tables to WordPress with the ergonomics of custom
+					post types. Schema-driven models, familiar queries, and native REST&nbsp;API,
+					WP-CLI, and admin integrations &mdash; no magic, full control.
+				</p>
+				<div class="hero-actions">
+					<a class="btn btn-primary" href="{{ '/design/' | relative_url }}">Read the docs</a>
+					<a class="btn btn-ghost" href="{{ site.github_url }}">View on GitHub</a>
+				</div>
+				<p class="hero-install"><code>composer require humanmade/foundry</code></p>
+			</div>
+			<div class="hero-code">
+				<div class="code-window">
+					<div class="code-window-bar">
+						<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+						<span class="code-window-title">class-event.php</span>
+					</div>
+					<div class="highlight"><pre><code><span class="k">use</span> <span class="nc">Foundry\Database\Model</span>;
+
+<span class="k">class</span> <span class="nc">Event</span> <span class="k">extends</span> <span class="nc">Model</span> {
+	<span class="k">protected static function</span> <span class="nf">get_table_name</span>() : <span class="kt">string</span> {
+		<span class="k">return</span> <span class="nv">$GLOBALS</span>[<span class="s1">'wpdb'</span>]-&gt;<span class="n">prefix</span> . <span class="s1">'events'</span>;
+	}
+
+	<span class="k">protected static function</span> <span class="nf">get_table_schema</span>() : <span class="kt">array</span> {
+		<span class="k">return</span> [
+			<span class="s1">'fields'</span> =&gt; [
+				<span class="s1">'id'</span>     =&gt; <span class="s1">'bigint(20) unsigned NOT NULL AUTO_INCREMENT'</span>,
+				<span class="s1">'name'</span>   =&gt; <span class="s1">'varchar(255)'</span>,
+				<span class="s1">'starts'</span> =&gt; <span class="s1">'datetime'</span>,
+			],
+			<span class="s1">'indexes'</span> =&gt; [
+				<span class="s1">'PRIMARY KEY (id)'</span>,
+			],
+		];
+	}
+}
+
+<span class="c1">// Real columns, real indexes, familiar API.</span>
+<span class="nv">$events</span> = <span class="nc">Event</span>::<span class="nf">query</span>( [ <span class="s1">'name'</span> =&gt; <span class="s1">'WordCamp'</span> ] );</code></pre></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="why" id="why">
+		<div class="wrap">
+			<h2>Why custom tables?</h2>
+			<p class="section-lead">
+				Custom post types are the path of least resistance, so everything becomes a post
+				&mdash; and every field becomes post meta. That works right up until it doesn&rsquo;t.
+			</p>
+			<div class="why-grid">
+				<div class="why-card why-card-before">
+					<h3>The workaround</h3>
+					<p>
+						Querying structured data through <code>wp_postmeta</code> means JOINs against
+						a key/value table and string comparisons on <code>longtext</code> columns.
+						At scale, it falls over.
+					</p>
+					<div class="highlight"><pre><code><span class="k">new</span> <span class="nc">WP_Query</span>( [
+	<span class="s1">'post_type'</span>  =&gt; <span class="s1">'event'</span>,
+	<span class="s1">'meta_query'</span> =&gt; [
+		[
+			<span class="s1">'key'</span>     =&gt; <span class="s1">'starts'</span>,
+			<span class="s1">'value'</span>   =&gt; <span class="s1">'2026-07-10'</span>,
+			<span class="s1">'compare'</span> =&gt; <span class="s1">'&gt;='</span>,
+		],
+	],
+] );
+<span class="c1">// JOIN on wp_postmeta, comparing strings. Ouch.</span></code></pre></div>
+				</div>
+				<div class="why-card why-card-after">
+					<h3>The Foundry way</h3>
+					<p>
+						Your data gets its own table, with proper column types and indexes you
+						design. You keep the convenience &mdash; and the database does what
+						databases are good at.
+					</p>
+					<div class="highlight"><pre><code><span class="nv">$events</span> = <span class="nc">Event</span>::<span class="nf">query</span>( [
+	<span class="s1">'starts'</span> =&gt; <span class="s1">'2026-07-10'</span>,
+] );
+<span class="c1">// One query on an indexed datetime column.</span></code></pre></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="features" id="features">
+		<div class="wrap">
+			<h2>Everything you need, nothing you don&rsquo;t</h2>
+			<p class="section-lead">
+				Start from a plain model and compose upwards. Traits add shared behaviour,
+				decorators map your models into WordPress systems that feel native.
+			</p>
+			<div class="features-grid">
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v13c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-13"/><path d="M4.5 12c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/></svg>
+					<h3>Schema-driven models</h3>
+					<p>Declare fields and indexes in your Active Record class; Foundry creates the table and handles CRUD. Accessors are yours to design.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/><path d="M8 10.5h5M10.5 8v5"/></svg>
+					<h3>Queries you already know</h3>
+					<p>A <code>WP_Query</code>-style builder, generated from your schema. Results are lazy, countable, and iterable.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="7" r="3.5"/><circle cx="17.5" cy="17" r="3.5"/><path d="M9 9.5 15 14.5"/></svg>
+					<h3>Relationships</h3>
+					<p>Many-to-many relationships between models &mdash; or with core posts, terms, users, and comments via built-in shims.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5c-2 0-2.5 1.5-2.5 3S5 11 3.5 12C5 13 5.5 14.5 5.5 16S6 19 8 19"/><path d="M16 5c2 0 2.5 1.5 2.5 3s.5 3 2 4c-1.5 1-2 2.5-2 4s-.5 3-2.5 3"/></svg>
+					<h3>REST API decorator</h3>
+					<p>Extend <code>Foundry\Api\Controller</code> &mdash; a real <code>WP_REST_Controller</code> &mdash; for full CRUD endpoints over your model.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="m6.5 9 3 3-3 3M12 15h5"/></svg>
+					<h3>WP-CLI decorator</h3>
+					<p>Scaffold <code>create</code>, <code>get</code>, <code>update</code>, <code>delete</code>, and <code>list</code> subcommands for any model with <code>Foundry\Cli\Command</code>.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="M2.5 9.5h19M2.5 14.5h19M8 9.5V20"/></svg>
+					<h3>Admin list tables</h3>
+					<p>A <code>WP_List_Table</code> that understands your model, plus a <code>WithActions</code> trait for row and bulk actions without the glue code.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11A8 8 0 1 0 18.5 15.5"/><path d="M20 4v7h-7"/></svg>
+					<h3>Atomic bulk saves</h3>
+					<p>The Importer decorator and <code>save_many()</code> wrap bulk operations in database transactions &mdash; all or nothing.</p>
+				</div>
+				<div class="feature">
+					<svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="12" width="9" height="9" rx="1.5"/><rect x="7.5" y="7.5" width="9" height="9" rx="1.5"/><rect x="12" y="3" width="9" height="9" rx="1.5"/></svg>
+					<h3>Compose with traits</h3>
+					<p>Foundry&rsquo;s <code>With*</code> traits add behaviour horizontally &mdash; and the pattern works just as well for your own shared fields.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="philosophy">
+		<div class="wrap">
+			<h2>Designed, not conjured</h2>
+			<div class="philosophy-grid">
+				<div class="principle">
+					<h3>Explicit over implicit</h3>
+					<p>No magic solutions, no surprise queries. You can read your code and know exactly what it does.</p>
+				</div>
+				<div class="principle">
+					<h3>Predictable and controllable</h3>
+					<p>You decide your accessors, your schema, and where to abstract. Foundry never takes decisions away from you.</p>
+				</div>
+				<div class="principle">
+					<h3>Defaults, not decisions</h3>
+					<p>Smart defaults get you moving fast, but they&rsquo;re only defaults &mdash; every behaviour can be overridden.</p>
+				</div>
+				<div class="principle">
+					<h3>Native to WordPress</h3>
+					<p><code>wpdb</code> prepared statements, <code>WP_Error</code>, the REST API, WP-CLI. It feels like WordPress because it is.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="steps">
+		<div class="wrap">
+			<h2>From schema to shipped</h2>
+			<div class="step">
+				<div class="step-copy">
+					<span class="step-num">1</span>
+					<h3>Define your model</h3>
+					<p>
+						Extend <code>Foundry\Database\Model</code>, declare your schema, and Foundry
+						creates the table. Add getters and setters your way &mdash; with validation
+						and typecasting where you want it.
+					</p>
+				</div>
+				<div class="highlight"><pre><code><span class="k">class</span> <span class="nc">Event</span> <span class="k">extends</span> <span class="nc">Model</span> {
+	<span class="k">use</span> <span class="nc">WithName</span>;
+
+	<span class="k">public function</span> <span class="nf">get_starts</span>() : ?<span class="nc">DateTime</span> {
+		<span class="nv">$starts</span> = <span class="nv">$this</span>-&gt;<span class="nf">get_field</span>( <span class="s1">'starts'</span> );
+		<span class="k">return</span> <span class="nv">$starts</span> ? <span class="k">new</span> <span class="nc">DateTime</span>( <span class="nv">$starts</span> ) : <span class="kc">null</span>;
+	}
+
+	<span class="c1">// …your schema, your rules.</span>
+}</code></pre></div>
+			</div>
+			<div class="step">
+				<div class="step-copy">
+					<span class="step-num">2</span>
+					<h3>Query it</h3>
+					<p>
+						Every field in your schema is queryable, and relationships can be queried
+						too. Results load lazily and behave like the arrays you&rsquo;re used to.
+					</p>
+				</div>
+				<div class="highlight"><pre><code><span class="nv">$events</span> = <span class="nc">Event</span>::<span class="nf">query</span>( [ <span class="s1">'name'</span> =&gt; <span class="s1">'WordCamp'</span> ] );
+
+<span class="k">foreach</span> ( <span class="nv">$events</span> <span class="k">as</span> <span class="nv">$event</span> ) {
+	<span class="nb">echo</span> <span class="nv">$event</span>-&gt;<span class="nf">get_name</span>();
+}</code></pre></div>
+			</div>
+			<div class="step">
+				<div class="step-copy">
+					<span class="step-num">3</span>
+					<h3>Decorate it</h3>
+					<p>
+						Layer on the integrations you need: REST API endpoints, WP-CLI commands,
+						admin list tables. Each decorator provides the defaults and leaves you
+						the control.
+					</p>
+				</div>
+				<div class="highlight"><pre><code><span class="k">class</span> <span class="nc">Events_Controller</span> <span class="k">extends</span> <span class="nc">Controller</span> {
+	<span class="k">protected function</span> <span class="nf">get_namespace</span>() : <span class="kt">string</span> {
+		<span class="k">return</span> <span class="s1">'example/v1'</span>;
+	}
+
+	<span class="k">protected function</span> <span class="nf">get_rest_base</span>() : <span class="kt">string</span> {
+		<span class="k">return</span> <span class="s1">'events'</span>;
+	}
+
+	<span class="k">protected function</span> <span class="nf">get_model</span>() : <span class="kt">string</span> {
+		<span class="k">return</span> <span class="nc">Event</span>::<span class="k">class</span>;
+	}
+
+	<span class="c1">// GET/POST/PUT/DELETE wp-json/example/v1/events</span>
+}</code></pre></div>
+			</div>
+		</div>
+	</section>
+
+	<section class="docs-cards" id="docs">
+		<div class="wrap">
+			<h2>Dig into the docs</h2>
+			<div class="cards-grid">
+				<a class="doc-card" href="{{ '/design/' | relative_url }}">
+					<h3>Design</h3>
+					<p>The philosophy and architecture: models, traits, decorators, and queries.</p>
+				</a>
+				<a class="doc-card" href="{{ '/example/' | relative_url }}">
+					<h3>Example Project</h3>
+					<p>Build a project tracker step by step, from first model to shared traits.</p>
+				</a>
+				<a class="doc-card" href="{{ '/relationships/' | relative_url }}">
+					<h3>Relationships</h3>
+					<p>Relate models to each other &mdash; and to core posts, terms, and users.</p>
+				</a>
+				<a class="doc-card" href="{{ '/decorator-list-table/' | relative_url }}">
+					<h3>Decorator: List Table</h3>
+					<p>Admin list tables with schema-driven columns and row &amp; bulk actions.</p>
+				</a>
+				<a class="doc-card" href="{{ '/decorator-api/' | relative_url }}">
+					<h3>Decorator: REST API <span class="chip">In progress</span></h3>
+					<p>Expose models over the REST API with a real <code>WP_REST_Controller</code>.</p>
+				</a>
+				<a class="doc-card" href="{{ '/decorator-cli/' | relative_url }}">
+					<h3>Decorator: CLI <span class="chip">In progress</span></h3>
+					<p>Manage your models from the terminal with scaffolded WP-CLI commands.</p>
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<section class="cta">
+		<div class="wrap cta-inner">
+			<h2>Ready to get forging?</h2>
+			<p class="hero-install"><code>composer require humanmade/foundry</code></p>
+			<p class="cta-warning">
+				<strong>A word of warning:</strong> Foundry is highly experimental, incomplete, and
+				not yet in production use. If you use it, be prepared to implement things yourself
+				&mdash; and to tell us how it went.
+			</p>
+			<div class="hero-actions">
+				<a class="btn btn-primary" href="{{ '/example/' | relative_url }}">Follow the example project</a>
+				<a class="btn btn-ghost" href="{{ site.github_url }}">Contribute on GitHub</a>
+			</div>
+		</div>
+	</section>
+
+</main>
