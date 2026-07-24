@@ -239,6 +239,85 @@ abstract class Model {
 		return true;
 	}
 
+	/**
+	 * Insert or update many new models in a single query.
+	 *
+	 * Bulk alternative to save_many() for write-and-discard ingestion: one
+	 * multi-row INSERT ... ON DUPLICATE KEY UPDATE instead of a per-model
+	 * INSERT plus reload SELECT. Rows colliding on any unique key are updated
+	 * in place with the new values.
+	 *
+	 * Models are not reloaded after the write (they gain no ID), so this is
+	 * for callers that discard the models afterwards.
+	 *
+	 * @param static[] $models New (unsaved) models to write. All models must
+	 *                         set the same fields.
+	 * @return int|WP_Error Affected-row count as reported by MySQL (1 per
+	 *                      insert, 2 per update, 0 per unchanged row), or
+	 *                      error.
+	 */
+	public static function upsert_many( array $models ) {
+		/** @var \wpdb $wpdb */
+		global $wpdb;
+
+		if ( empty( $models ) ) {
+			return 0;
+		}
+
+		$table = static::get_table_name();
+		$columns = null;
+		$placeholders = [];
+		$values = [];
+
+		foreach ( $models as $model ) {
+			if ( ! $model instanceof static || ! $model->is_new() ) {
+				return new WP_Error(
+					'foundry.database.model.upsert_many.invalid_model',
+					sprintf( 'upsert_many() requires new, unsaved instances of %s', static::class )
+				);
+			}
+
+			$fields = $model->updated;
+			ksort( $fields );
+
+			if ( $columns === null ) {
+				$columns = array_keys( $fields );
+			} elseif ( array_keys( $fields ) !== $columns ) {
+				return new WP_Error(
+					'foundry.database.model.upsert_many.mismatched_fields',
+					'All models passed to upsert_many() must set the same fields'
+				);
+			}
+
+			$placeholders[] = '(' . implode( ', ', array_fill( 0, count( $columns ), '%s' ) ) . ')';
+			array_push( $values, ...array_values( $fields ) );
+		}
+
+		$column_sql = implode( ', ', array_map( function ( $column ) {
+			return "`{$column}`";
+		}, $columns ) );
+		$update_sql = implode( ', ', array_map( function ( $column ) {
+			return "`{$column}` = VALUES(`{$column}`)";
+		}, $columns ) );
+
+		$query = "INSERT INTO `{$table}` ({$column_sql}) VALUES "
+			. implode( ', ', $placeholders )
+			. " ON DUPLICATE KEY UPDATE {$update_sql}";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholders built above, values bound via prepare().
+		$result = $wpdb->query( $wpdb->prepare( $query, $values ) );
+
+		if ( $result === false ) {
+			return new WP_Error(
+				'foundry.database.model.upsert_many.could_not_write',
+				$wpdb->last_error,
+				compact( 'table', 'columns' )
+			);
+		}
+
+		return (int) $result;
+	}
+
 	public function delete() {
 		/** @var \wpdb $wpdb */
 		global $wpdb;
